@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "id": "027407e2-b537-45d6-92f7-fe611e07a4e5",
+  "repository": "rhkim00/ex-tig-20261111-0614-027407",
+  "sourceCommit": "f115d4ee150cf67073b1c6dc90ed9d1cd350232c",
+  "request": {
+    "title": "Implement a Transformer architecture from scratch",
+    "requestCategory": "feature",
+    "scope": "Requester's request (Korean, kept as-is): \"Transformer architecture를 구현해줘\" (implement the Transformer architecture).\n\nCurrent state: /data1/yccho/ex is a git repository on branch master at commit f115d4e (\"Initialize project for Tokenisgold\") with no tracked project files: no source, README, package file, or config. The only content is the .git directory.\n\nAssumption: no language or framework was named, so the worker creates a single Python module using PyTorch (torch.nn) at the project root, named transformer.py. Assumption: \"Transformer\" means the original encoder-decoder design from \"Attention Is All You Need\" (Vaswani et al., 2017).\n\nExpected end state: transformer.py contains these components, all built from torch.nn primitives:\n- Scaled dot-product attention with optional mask, and multi-head attention with separate Q/K/V and output projections.\n- Position-wise feed-forward network (Linear, ReLU, Linear).\n- Sinusoidal positional encoding (fixed, not learned) with dropout.\n- Encoder layer and decoder layer, each with residual connections and post-LayerNorm (the paper's ordering). The decoder layer has masked self-attention and cross-attention over the encoder output.\n- Encoder and decoder stacks taking N layers as a parameter.\n- A top-level Transformer class with source and target token embeddings (scaled by sqrt(d_model)), an output linear projection to the target vocabulary, and masks: padding mask for source and target, and causal (look-ahead) mask for the decoder. The forward pass returns logits of shape (batch, tgt_len, tgt_vocab_size).\n- Defaults matching the paper's base model where reasonable: d_model=512, heads=8, d_ff=2048, layers=6, dropout=0.1. Every hyperparameter is also a constructor argument.\n\nAdd a short docstring to each class and a module-level usage example in the docstring. Do not add a training loop, data loader, or tokenizer. Those were not requested.",
+    "acceptanceChecks": [
+      "transformer.py exists at the project root, and it defines the classes MultiHeadAttention, PositionalEncoding, EncoderLayer, DecoderLayer, and Transformer (plus any helper classes or functions it needs).",
+      "With torch installed, `python -c \"import transformer\"` completes with no error.",
+      "With a small config (e.g. d_model=32, heads=4, d_ff=64, layers=2, src_vocab=50, tgt_vocab=60), a forward pass on random token ids of shape (2, 7) source and (2, 5) target returns a tensor of shape (2, 5, 60) in eval mode.",
+      "The decoder uses a causal mask: changing a later target token does not change the logits at earlier target positions (checked in eval mode).",
+      "Changing source tokens at padded positions (masked by the padding mask) does not change the output, and the attention weights of masked positions are zero or near zero.",
+      "Scaled dot-product attention divides scores by sqrt(d_k) before softmax. Multi-head attention splits d_model evenly across heads and raises an error or assertion when d_model is not divisible by heads."
+    ],
+    "aiRequirement": {
+      "provider": "claude",
+      "model": "claude-opus-5-5",
+      "effort": "high",
+      "source": "declared"
+    },
+    "rewardTig": "0",
+    "rewardMultiplier": "1.5",
+    "executionDeadlineAt": "2026-11-12T06:14:36.720Z",
+    "originalRequest": "Transformer architecture를 구현해줘",
+    "context": "Project folder: ex. Git: branch master at f115d4e; 0 changed and 0 new file(s) not yet committed. Tracked files: none.",
+    "completedWork": "Recent commits: \"Initialize project for Tokenisgold\".",
+    "constraints": [
+      "Create only transformer.py at the project root. Do not modify .git contents or any other files, and do not add dependencies beyond PyTorch (torch) and the Python standard library.",
+      "Assumption: no existing code exists to keep compatible, so there are no public interfaces to preserve. If the worker finds any project files when starting, follow the existing conventions instead of this document's layout.",
+      "Do not add training, inference-decoding (beam search or greedy generation loop), tokenization, or data-loading code.",
+      "Model must be deterministic when dropout is disabled (model.eval()), so outputs can be checked by shape and by mask behaviour."
+    ],
+    "setupSteps": [
+      "No install command was found in the project: no README, requirements file, pyproject.toml, or setup script exists. Confirm with the requester: Python 3 with PyTorch (`pip install torch`) is the assumed environment.",
+      "Confirm which Python interpreter and torch version the requester uses before the worker starts."
+    ],
+    "testSteps": [
+      "No test command was found in the project. Review transformer.py against the acceptance checks above by reading it.",
+      "Assumption: run `python -c \"import transformer\"` from the project root to check it imports (requires torch).",
+      "Assumption: run a short script from the project root that builds the small config in the acceptance checks, runs a forward pass in eval mode, and asserts the output shape (2, 5, 60) and the causal and padding mask behaviour. Do not put this script in the project unless asked; run it from a separate directory with transformer.py on PYTHONPATH.",
+      "Confirm with the requester whether a test file should be added. None was requested, so none is planned here."
+    ]
+  },
+  "layout": "tree"
+}
